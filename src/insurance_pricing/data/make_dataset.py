@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pandas as pd
 
 from insurance_pricing.data.load_fremtpl import build_policy_frame, fetch_fremtpl
 from insurance_pricing.data.load_quotes import load_quotes
