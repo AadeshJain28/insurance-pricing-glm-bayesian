@@ -48,7 +48,7 @@ class DemandCfg(BaseModel):
 
 class PricingCfg(BaseModel):
     price_grid_lo: float = 0.5
-    price_grid_hi: float = 3.0
+    price_grid_hi: float = 8.0
     price_grid_n: int = 60
 
 

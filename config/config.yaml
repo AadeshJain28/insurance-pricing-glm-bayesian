@@ -33,7 +33,7 @@ demand:
 
 pricing:
   price_grid_lo: 0.5            # multipliers on the technical price
-  price_grid_hi: 3.0
+  price_grid_hi: 8.0            # widened: -0.5 elasticity optimum was censored at 3.0
   price_grid_n: 60
 
 validation:

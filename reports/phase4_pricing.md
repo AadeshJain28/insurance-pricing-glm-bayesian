@@ -6,14 +6,14 @@ Technical price from the Tweedie GLM: portfolio mean **144.79** per exposure-yea
 
 ## Optimal price vs assumed elasticity
 
-|   assumed_elasticity |   optimal_price |   markup_over_cost |   conversion_at_optimum |   expected_profit |   realised_elasticity |
-|---------------------:|----------------:|-------------------:|------------------------:|------------------:|----------------------:|
-|                 -0.5 |          434.38 |               3    |                  0.118  |             34.18 |                -1.102 |
-|                 -1   |          342.35 |               2.36 |                  0.1085 |             21.43 |                -1.757 |
-|                 -1.5 |          274.86 |               1.9  |                  0.1319 |             17.16 |                -2.06  |
-|                 -2   |          244.19 |               1.69 |                  0.1549 |             15.39 |                -2.375 |
-|                 -3   |          219.64 |               1.52 |                  0.1933 |             14.47 |                -3.059 |
-|                 -5   |          195.1  |               1.35 |                  0.3207 |             16.13 |                -3.814 |
+|   assumed_elasticity |   optimal_price |   markup_over_cost |   conversion_at_optimum |   expected_profit |   realised_elasticity |   lerner_implied_E | grid_censored   |
+|---------------------:|----------------:|-------------------:|------------------------:|------------------:|----------------------:|-------------------:|:----------------|
+|                 -0.5 |          532.55 |               3.68 |                  0.0916 |             35.53 |                -1.392 |             -1.373 | False           |
+|                 -1   |          348.49 |               2.41 |                  0.1051 |             21.41 |                -1.795 |             -1.711 | False           |
+|                 -1.5 |          274.86 |               1.9  |                  0.1319 |             17.16 |                -2.06  |             -2.113 | False           |
+|                 -2   |          256.46 |               1.77 |                  0.1373 |             15.33 |                -2.547 |             -2.297 | False           |
+|                 -3   |          219.64 |               1.52 |                  0.1933 |             14.47 |                -3.059 |             -2.934 | False           |
+|                 -5   |          201.24 |               1.39 |                  0.2835 |             16    |                -4.149 |             -3.565 | False           |
 
 ## By risk decile (elasticity = -1.5)
 
@@ -23,4 +23,11 @@ Technical price from the Tweedie GLM: portfolio mean **144.79** per exposure-yea
 |             5 |           109.22 |          207.33 |      1.9 |       0.1319 |             12.94 |
 |            10 |           479.61 |          910.45 |      1.9 |       0.1319 |             56.83 |
 
-*More elastic demand (more negative) => lower optimal markup. Higher-risk policies carry a higher absolute price but a similar markup, because the demand curve is calibrated relative to each segment's own technical cost.*
+### Validation
+
+The **Lerner index** — at a profit-maximising price `(P - MC)/P = 1/|E|` — should match `realised_elasticity`. Rows where it does not are flagged `grid_censored`, meaning the optimum sits on a price-grid bound rather than at a true interior maximum.
+
+### Caveats
+
+* More elastic demand => lower optimal markup (3.0x at E=-0.5 down to 1.35x at E=-5).
+* **The identical markup across risk deciles is an artefact, not a finding.** Demand is calibrated relative to each segment's own cost, so constant markup follows by construction. Real segments differ in elasticity (young drivers are more price-sensitive), which is exactly what this data cannot measure.

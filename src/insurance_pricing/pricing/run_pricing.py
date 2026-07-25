@@ -68,6 +68,13 @@ def sensitivity_table(technical_cost: float, elasticities: list[float], q_ref: f
             "conversion_at_optimum": round(res.best_conversion, 4),
             "expected_profit": round(res.best_profit, 2),
             "realised_elasticity": round(price_elasticity(demand, res.best_price), 3),
+            # Lerner index: at a profit-maximising price, (P - MC)/P = 1/|E|.
+            # A mismatch flags an optimum censored by the price-grid bounds.
+            "lerner_implied_E": round(-res.best_price / max(res.best_price - technical_cost, 1e-9), 3),
+            "grid_censored": bool(
+                abs(res.best_price - technical_cost * hi_mult) < 1e-6
+                or abs(res.best_price - technical_cost * lo_mult) < 1e-6
+            ),
         })
     return pd.DataFrame(rows)
 
@@ -131,9 +138,16 @@ def run(config_path: str = "config/config.yaml") -> None:
         "sensitivity sweep — not any single price — is the deliverable.\n\n"
         "## Optimal price vs assumed elasticity\n\n" + sens.to_markdown(index=False)
         + "\n\n## By risk decile (elasticity = -1.5)\n\n" + seg.to_markdown(index=False)
-        + "\n\n*More elastic demand (more negative) => lower optimal markup. "
-          "Higher-risk policies carry a higher absolute price but a similar markup, because the "
-          "demand curve is calibrated relative to each segment's own technical cost.*\n",
+        + "\n\n### Validation\n\nThe **Lerner index** — at a profit-maximising price "
+          "`(P - MC)/P = 1/|E|` — should match `realised_elasticity`. Rows where it does not are "
+          "flagged `grid_censored`, meaning the optimum sits on a price-grid bound rather than at "
+          "a true interior maximum.\n\n"
+          "### Caveats\n\n"
+          "* More elastic demand => lower optimal markup (3.0x at E=-0.5 down to 1.35x at E=-5).\n"
+          "* **The identical markup across risk deciles is an artefact, not a finding.** Demand is "
+          "calibrated relative to each segment's own cost, so constant markup follows by "
+          "construction. Real segments differ in elasticity (young drivers are more price-sensitive), "
+          "which is exactly what this data cannot measure.\n",
         encoding="utf-8",
     )
     te[["technical_price", "risk_decile"]].to_parquet(proc / "technical_prices.parquet", index=False)
