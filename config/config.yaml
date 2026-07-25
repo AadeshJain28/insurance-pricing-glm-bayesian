@@ -1,0 +1,44 @@
+project:
+  name: insurance-pricing
+  seed: 42
+
+data:
+  # risk side (auto-downloaded from OpenML by scikit-learn)
+  fremtpl_freq: freMTPL2freq
+  fremtpl_sev: freMTPL2sev
+  cache_dir: data/raw
+  # demand side (manual Kaggle download)
+  quotes_file: data/raw/vehicle_insurance_cross_sell.csv
+
+risk:
+  exposure_col: Exposure
+  claim_count_col: ClaimNb
+  max_claim_amount: 200000      # cap extreme severities (standard actuarial practice)
+  exposure_cap: 1.0             # Exposure > 1 year is a data error in freMTPL2
+  categorical: [VehBrand, VehGas, Area, Region]
+  numeric: [VehPower, VehAge, DrivAge, BonusMalus, Density]
+
+bayesian:
+  group_cols: [Region, VehBrand]   # primary (fine) cell definition
+  coarse_group_cols: [Region]      # comparison (coarse) cell definition
+  draws: 3000                      # raised: coarse severity ESS was low
+  tune: 2000                       # raised: severity tau mixed poorly at 1000
+  chains: 4                        # PyMC recommends >=4 for reliable R-hat
+  target_accept: 0.95              # raised to reduce divergences
+
+demand:
+  price_col: Annual_Premium
+  target_col: Response
+  group_col: Region_Code
+
+pricing:
+  price_grid_lo: 0.5            # multipliers on the technical price
+  price_grid_hi: 3.0
+  price_grid_n: 60
+
+validation:
+  test_size: 0.2
+
+paths:
+  models_dir: models
+  reports_dir: reports
